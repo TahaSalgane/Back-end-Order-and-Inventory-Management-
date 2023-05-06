@@ -24,3 +24,5 @@ Route::post('/register',[AuthController::class,'register']);
 Route::post('/forgetpassword',[ForgetController::class,'ForgetPassword']);
 Route::post('/resetpassword',[ResetController::class,'ResetPassword']);
 Route::get('/user',[UserController::class,'user'])->middleware('auth:api');
+
+Route::post('/updateProfile',[UserController::class,'updateProfile'])->middleware('auth:api');
