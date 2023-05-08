@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+// use App\Models\image;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,14 +24,17 @@ class AuthController extends Controller
             if (Auth()->attempt($credentials)) {
                 $user = Auth::user();
                 $token = $user->createToken('app')->accessToken;
-                $profilePicture = $user->image ? Storage::url($user->image) : null;
-    
+                // $profilePicture = $user->image ? Storage::url($user->image) : null;
+                $profilePicture = $user->image()->where([
+                    'imageable_id' => $user->id
+                ])->select("path")->first();
+
                 return response()->json([
                     '_id' => $user->id,
                     'role' => $user->role,
                     'username' => $user->name,
                     'token' => $token,
-                    'profile_image' => $profilePicture
+                    'profile_image' =>$profilePicture
                 ]);
             } else {
                 return response()->json(['error' => 'Incorrect Email or Password!'], 401);
