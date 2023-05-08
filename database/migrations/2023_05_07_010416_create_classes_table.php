@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('NomSalle') ;
             $table->string('type') ;
+            $table->text('articles')->nullable() ;
             $table->timestamps();
         });
     }

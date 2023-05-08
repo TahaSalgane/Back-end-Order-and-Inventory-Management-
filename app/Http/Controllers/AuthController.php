@@ -20,7 +20,7 @@ class AuthController extends Controller
     {
         try {
             $credentials = ['email' => $request->email, 'password' => $request->password];
-    
+
             if (Auth()->attempt($credentials)) {
                 $user = Auth::user();
                 $token = $user->createToken('app')->accessToken;
@@ -45,8 +45,8 @@ class AuthController extends Controller
             ], 400);
         }
     }
-    
 
+    
     public function Register(Request $request){
         try{
             $user=User::create([
