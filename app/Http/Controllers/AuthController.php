@@ -34,7 +34,7 @@ class AuthController extends Controller
                     'role' => $user->role,
                     'username' => $user->name,
                     'token' => $token,
-                    'profile_image' =>$profilePicture
+                    'profile_image' =>$profilePicture->path
                 ]);
             } else {
                 return response()->json(['error' => 'Incorrect Email or Password!'], 401);

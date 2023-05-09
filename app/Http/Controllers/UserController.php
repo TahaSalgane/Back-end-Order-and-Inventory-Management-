@@ -31,13 +31,16 @@ class UserController extends Controller
                         // if exist => update
                         $path = $image->store('public/images');
                         $url = Storage::url($path);
+                        // 
+                        $PathToDelete = str_replace("/storage", "public", $existedImage->path);
+
                         $user->image()->where([
                             'imageable_id' => $user->id
                         ])->update([
                             'path' => $url
                         ]) ;
                         // delete the existed image from Storage disk
-                        Storage::delete($existedImage->path) ;
+                        Storage::delete($PathToDelete) ;
                         return response()->json([
                             'profile_image'=> $url
                         ]) ;
@@ -57,7 +60,7 @@ class UserController extends Controller
                     $path = Storage::url($existedImage->path);
                     $url = url($path);
                     return response()->json([
-                        'image_url' => $url 
+                        'image_url' => $url
                     ]) ;
                 }else{
                     return response()->json([
