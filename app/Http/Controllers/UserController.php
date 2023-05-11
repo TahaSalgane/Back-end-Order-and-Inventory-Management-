@@ -10,6 +10,80 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function index()
+    {
+        $authenticatedUser = Auth::user();
+        $allowedRoles = [$authenticatedUser->role];
+
+        if ($authenticatedUser->role === 'directeur complexe') {
+            $allowedRoles[] = 'directeur etablissement';
+            $allowedRoles[] = 'magasinier';
+        }
+
+        $users = User::whereIn('role', $allowedRoles)->get();
+
+        return response()->json($users);
+    }
+    public function store(Request $request)
+    {
+        $user = Auth::user();
+        $allowedRoles = [$user->role];
+        if ($user->role === 'directeur complexe') {
+            $allowedRoles[] = 'directeur etablissement';
+            $allowedRoles[] = 'magasinier';
+        }
+        $this->validate($request, [
+            'role' => 'required|in:' . implode(',', $allowedRoles),
+        ]);
+        $newUser = new User();
+        $newUser->username = $request->input('username');
+        $newUser->email = $request->input('email');
+        $newUser->password = Hash::make($request->password);
+        $newUser->role = $request->input('role');
+        $newUser->save();
+
+        return response()->json($newUser);
+    }
+    public function update(Request $request, User $user)
+    {
+        $authenticatedUser = Auth::user();
+        $allowedRoles = [$authenticatedUser->role];
+        if ($authenticatedUser->role === 'directeur complexe') {
+            $allowedRoles[] = 'directeur etablissement';
+            $allowedRoles[] = 'magasinier';
+        }
+        $this->validate($request, [
+            'role' => 'required|in:' . implode(',', $allowedRoles),
+        ]);
+        $user->username = $request->input('username');
+        $user->email = $request->input('email');
+        $user->password = Hash::make($request->password);
+        $user->role = $request->input('role');
+
+        $user->save();
+
+        return response()->json($user);
+    }
+    public function destroy(User $user)
+    {
+        $authenticatedUser = Auth::user();
+    
+        if ($authenticatedUser->role === 'magasinier' && $user->role !== 'magasinier') {
+            return response()->json(['message' => 'You can only delete magasinier users.'], 403);
+        }
+    
+        if ($authenticatedUser->role === 'directeur etablissement' && $user->role !== 'directeur etablissement') {
+            return response()->json(['message' => 'You can only delete directeur etablissement users.'], 403);
+        }
+    
+        if ($authenticatedUser->role === 'directeur complexe' && $user->role !== 'directeur complexe' && $user->role !== 'directeur etablissement' && $user->role !== 'magasinier') {
+            return response()->json(['message' => 'You can only delete directeur complexe, directeur etablissement, and magasinier users.'], 403);
+        }
+    
+        $user->delete();
+    
+        return response()->json(['message' => 'User deleted successfully.']);
+    }
     public function user(){
         return Auth::user();
     }
