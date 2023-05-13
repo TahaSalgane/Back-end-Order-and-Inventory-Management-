@@ -28,13 +28,16 @@ class AuthController extends Controller
                 $profilePicture = $user->image()->where([
                     'imageable_id' => $user->id
                 ])->select("path")->first();
-
+                $profileImagePath = null;
+                if ($profilePicture) {
+                    $profileImagePath = $profilePicture->path;
+                }
                 return response()->json([
                     '_id' => $user->id,
                     'role' => $user->role,
                     'username' => $user->name,
                     'token' => $token,
-                    'profile_image' =>$profilePicture->path
+                    'profile_image' =>$profileImagePath
                 ]);
             } else {
                 return response()->json(['error' => 'Incorrect Email or Password!'], 401);

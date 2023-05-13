@@ -36,7 +36,7 @@ class UserController extends Controller
             'role' => 'required|in:' . implode(',', $allowedRoles),
         ]);
         $newUser = new User();
-        $newUser->username = $request->input('username');
+        $newUser->name = $request->input('username');
         $newUser->email = $request->input('email');
         $newUser->password = Hash::make($request->password);
         $newUser->role = $request->input('role');
@@ -55,7 +55,7 @@ class UserController extends Controller
         $this->validate($request, [
             'role' => 'required|in:' . implode(',', $allowedRoles),
         ]);
-        $user->username = $request->input('username');
+        $user->name = $request->input('username');
         $user->email = $request->input('email');
         $user->password = Hash::make($request->password);
         $user->role = $request->input('role');
@@ -64,10 +64,10 @@ class UserController extends Controller
 
         return response()->json($user);
     }
-    public function destroy(User $user)
+    public function destroy($id)
     {
         $authenticatedUser = Auth::user();
-    
+        $user = User::find($id);
         if ($authenticatedUser->role === 'magasinier' && $user->role !== 'magasinier') {
             return response()->json(['message' => 'You can only delete magasinier users.'], 403);
         }
