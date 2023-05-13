@@ -11,4 +11,6 @@ class article extends Model
     protected $fillable = [
         'designationArticle'
     ] ;
+
+
 }

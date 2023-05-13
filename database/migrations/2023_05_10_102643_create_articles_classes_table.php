@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('classes', function (Blueprint $table) {
+        Schema::create('articles_classes', function (Blueprint $table) {
             $table->id();
-            $table->string('nomSalle') ;
-            $table->enum('type',['type1','type2','type3','type4']) ;
+            $table->unsignedBigInteger('classe_id')->onDelete('cascade');
+            // this field contain all information about the articles
+            $table->json('articles') ;
+
+            $table->foreign('classe_id')->references('id')->on('classes')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('classes');
+        Schema::dropIfExists('articles_classes');
     }
 };
