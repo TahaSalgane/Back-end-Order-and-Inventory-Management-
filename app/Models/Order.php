@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Order extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'titre' ,
+        'articles' ,
+        'etablissement' ,
+        'status' ,
+        'user_id'
+    ] ;
+
+    public function reclamation(){
+        return $this->hasOne(Reclamation::class) ;
+    }
+}

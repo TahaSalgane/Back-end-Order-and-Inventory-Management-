@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('articles_classes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('classe_id')->onDelete('cascade');
+            $table->unsignedBigInteger('classe_id');
             // this field contain all information about the articles
             $table->json('articles') ;
 

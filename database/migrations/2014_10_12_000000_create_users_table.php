@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->enum('role', ['magasinier', 'directeur etablissement', 'directeur complexe']);
+            $table->enum('etablissement',['complexe','syba','babDokala' ,'daoudiat', 'jbelKhder'])->default('complexe') ;
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

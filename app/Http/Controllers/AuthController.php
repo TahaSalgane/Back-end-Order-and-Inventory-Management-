@@ -49,13 +49,17 @@ class AuthController extends Controller
         }
     }
 
-    
+
     public function Register(Request $request){
         try{
+            // return response()->json([
+            //     $request->etablissement
+            // ]) ;
             $user=User::create([
                 'name'=>$request->name,
                 'role' => $request->role ,
                 'email'=>$request->email,
+                'etablissement' => $request->etablissement ,
                 'password'=> Hash::make($request->password)
             ]);
             $token=$user->createToken('app')->accessToken;
