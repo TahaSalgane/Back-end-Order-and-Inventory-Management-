@@ -36,7 +36,7 @@ Route::controller(ArticleController::class)->group(function () {
     Route::get('/articles','getArticles')->middleware('auth:api') ;
     Route::post('/addArticle','addArticle')->middleware('auth:api') ;
     Route::put('/editActicle','editActicle')->middleware('auth:api') ;
-    Route::delete('/deleteArticle','deleteArticle')->middleware('auth:api') ;
+    Route::delete('deleteArticle/{id}','deleteArticle')->middleware('auth:api') ;
 });
 
 Route::controller(ClasseController::class)->group(function () {

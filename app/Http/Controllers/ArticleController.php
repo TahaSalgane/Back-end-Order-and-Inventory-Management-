@@ -30,10 +30,8 @@ class ArticleController extends Controller
                     'designationArticle' => $request->designationArticle
                 ]) ;
                 return response()->json([
-                    'articles added succesfully !' ,
-                    $article->id
-
-                ]) ;
+                    "articles" =>$article
+                ]);
             }
             return response()->json([
                 'error' => 'Only magasinier can add articles'
@@ -51,9 +49,9 @@ class ArticleController extends Controller
             if($authUser->role == 'magasinier'){
                 $article = article::find($request->id)->update([
                     'designationArticle' => $request->designationArticle
-                ]) ;
+                ]);
                 return response()->json([
-                    'message' => 'article updated succesfully !' ,
+                    'articlesUpdated' => $article,
                 ]) ;
             }
             return response()->json([
@@ -67,22 +65,32 @@ class ArticleController extends Controller
         }
     }
 
-    public function deleteArticle(Request $request){
+    public function deleteArticle($id)
+    {
         try {
-            $authUser = Auth::user() ;
-            if($authUser->role == 'magasinier'){
-                article::find($request->id)->delete() ;
-                return response()->json([
-                    'success' => 'article deleted succesfully !'
-                ]) ;
+            $authUser = Auth::user();
+            if ($authUser->role == 'magasinier') {
+                $article = Article::find($id);
+                if ($article) {
+                    $article->delete();
+                    $articles = Article::all();
+                    return response()->json([
+                        'articles' => $articles,
+                    ]);
+                } else {
+                    return response()->json([
+                        'error' => 'Article not found',
+                    ], 404);
+                }
             }
             return response()->json([
-                'error' => 'Only magasinier can add articles'
-            ],400) ;
+                'error' => 'Only magasinier can delete articles',
+            ], 403);
         } catch (Exception $exp) {
             return response()->json([
-                'error' => $exp->getMessage()
-            ]) ;
+                'error' => $exp->getMessage(),
+            ]);
         }
     }
+    
 }
