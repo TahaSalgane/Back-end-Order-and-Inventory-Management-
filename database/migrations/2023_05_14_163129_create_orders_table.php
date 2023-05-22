@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('titre') ;
-            $table->json('articles') ;
+            $table->text('articles');
             $table->enum('etablissement',['syba','babDokala' ,'daoudiat', 'jbelKhder']) ;
             $table->enum('status',['sent','inProgress','delivered'])->default('sent') ;
             $table->unsignedBigInteger('user_id');

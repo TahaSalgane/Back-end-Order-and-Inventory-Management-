@@ -11,6 +11,9 @@ class article extends Model
     protected $fillable = [
         'designationArticle'
     ] ;
-
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 
 }

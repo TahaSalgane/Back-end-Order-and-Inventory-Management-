@@ -18,4 +18,8 @@ class classe extends Model
     {
         return $this->hasOne(articlesClass::class);
     }
+    public function order()
+{
+    return $this->belongsTo(Order::class);
+}
 }
