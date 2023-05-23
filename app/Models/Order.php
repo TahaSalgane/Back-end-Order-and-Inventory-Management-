@@ -17,6 +17,10 @@ class Order extends Model
         'user_id'
     ] ;
 
+    public function articles()
+    {
+        return $this->hasMany(articles::class);
+    }
     public function reclamation(){
         return $this->hasOne(Reclamation::class) ;
     }

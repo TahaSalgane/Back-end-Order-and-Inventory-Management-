@@ -38,6 +38,7 @@ class AuthController extends Controller
                     'username' => $user->name,
                     'etablissement' => $user->etablissement ,
                     'token' => $token,
+                    'etablissement' => $user->etablissement,
                     'profile_image' =>$profileImagePath
                 ]);
             } else {

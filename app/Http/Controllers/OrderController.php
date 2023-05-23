@@ -9,17 +9,18 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function orders(){
-        $authUser = Auth::user() ;
+    public function orders()
+    {
+        $authUser = Auth::user();
         try {
-            $orders = Order::with('reclamation')->get() ;
-            return  response()->json([
-                ($orders)
+            $orders = Order::with('articles')->get();
+            return response()->json([
+                "orders" => $orders
             ]);
         } catch (Exception $exp) {
             return response()->json([
                 'error' => $exp->getMessage()
-            ]) ;
+            ]);
         }
     }
 
@@ -30,14 +31,17 @@ class OrderController extends Controller
             //     $authUser
             // ]) ;
             if($authUser->role == 'directeur etablissement'){ // Check if the user role is not equal to directeur etablissement => add order
-                $authUser->orders()->create([
-                    'titre' => $request->titre ,
-                    'articles' => json_encode($request->articles) ,
-                    'etablissement' => $authUser->etablissement ,
-                ]) ;
-                return response()->json([
-                    'message' => 'Order has been added successfuly !'
-                ]) ;
+                Order::create([
+                    'titre' => $request->titre,
+                    'articles' => $request->articles, // Assign the array directly
+                    'etablissement' => $authUser->etablissement,
+                    'user_id' => $authUser->id,
+                ]);
+                
+                $orders = Order::with('articles')->get();
+                return  response()->json([
+                    "orders"=>$orders
+                ]);
             }
             return  response()->json([
                 'error' => 'User of type magasinier can not add orders !'
