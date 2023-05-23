@@ -7,17 +7,28 @@ use App\Models\articlesClass;
 use App\Models\classe;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class ClasseController extends Controller
 {
-     public function getClasses(){
+     public function getClasses($etablissment){
+        // return response()->json($etablissment) ;
         try {
-            $classes = classe::get();
+            // return response()->json([
+            //     $etablissment
+            // ]) ;
+            $authUser = Auth::user() ;
+            if ($authUser->role != 'directeur etablissement') {
+                $classes = classe::where('etablissement', $etablissment)->get() ;
+                return response()->json([
+                     'classes'=> $classes
+                    ]) ;
+            }
+            $classes = classe::where('etablissement', $authUser->etablissement)->get() ;
             return response()->json([
-                 $classes,
-
+                 'classes'=> $classes?$classes:[]
                 ]) ;
         } catch (Exception $exp) {
             return response()->json([
@@ -28,12 +39,16 @@ class ClasseController extends Controller
 
     public function addClasse(Request $request){
         try {
-            classe::create([
+            // return response()->json($request->all()) ;
+            $classeId = classe::insertGetId([
                 'nomSalle' => $request->nomSalle ,
+                'etablissement' => $request->etablissement ,
                 'type' => $request->type
             ]) ;
+            $classe = classe::find($classeId) ;
             return response()->json([
-                'classe added succesfully !' ,
+                'message' =>'classe added succesfully !' ,
+                'classe'  => $classe
 
             ]) ;
         } catch (Exception $exp) {
@@ -45,9 +60,10 @@ class ClasseController extends Controller
 
     public function editClasse(Request $request){
         try {
-
+            // return response()->json($request->all() ) ;
             $classe = classe::find($request->id)->update([
-                $request->all()
+                'nomSalle' => $request->nomSalle ,
+                'type' => $request->type
             ]) ;
             return response()->json([
                 'message' => 'classe updated succesfully !' ,
@@ -60,11 +76,11 @@ class ClasseController extends Controller
         }
     }
 
-    public function deleteClasse(Request $request){
+    public function deleteClasse($id){
         try {
-            classe::find($request->id)->delete() ;
+            classe::find($id)->delete() ;
             return response()->json([
-                'classe deleted succesfully !'
+                'message' => 'classe deleted succesfully !'
             ]) ;
         } catch (Exception $exp) {
             return response()->json([
@@ -72,19 +88,33 @@ class ClasseController extends Controller
             ]) ;
         }
     }
-    public function articlesClasse(Request $request){
+    public function articlesClasse($id){
 
-        $articlesClasse = articlesClass::where('classe_id',$request->classe_id)->get()->pluck('articles') ;
+        // return response()->json($id) ;
+        $articlesClasse = articlesClass::where('classe_id',$id)->get()->pluck('articles') ;
+        $avaliableArticles = article::all() ;
+        // return response()->json([
+        //     $articlesClasse
+        // ]) ;
+        if(count($articlesClasse)>0){
+            return response()->json([
+                'articles' => json_decode($articlesClasse),
+                'avaliableArticles' => $avaliableArticles
+            ]) ;
+        }
         return response()->json([
-            'articles ' => json_decode($articlesClasse)
+            'message' => 'no articles in this classe' ,
+            'avaliableArticles' => $avaliableArticles ,
+            'articles' => []
         ]) ;
 
     }
 
     public function addArticlesOnClasse(Request $request){
         try {
-
+            $avaliableArticles = article::all() ;
             $classe = classe::find($request->classe_id) ;
+
             $articlesClass = articlesClass::where('classe_id',$request->classe_id)->first() ;
 
             if($articlesClass){
@@ -120,17 +150,23 @@ class ClasseController extends Controller
                         'articles' => $articlesList
                         ]) ;
                     return response()->json([
-                        'Article added with success !'
+                        'message'=> 'Article added with success !' ,
+                        'article' => $request->article ,
+                        'avaliableArticles' => $avaliableArticles
                     ]) ;
                 }
 
                 // case 2 : false => create new article inside the classe_articles class
                 $articlesList[] = $request->article ;
                 $articlesClass->update([
-                    'articles' => $articlesList
+                    'articles' => $articlesList ,
+
+
                     ]) ;
                 return response()->json([
-                    'Article added with success into emty classe articles !'
+                    'message'=>'Article added with success into emty classe articles !' ,
+                    'avaliableArticles' => $avaliableArticles ,
+                    'article' => $request->article
                 ]) ;
             }
             // if the there is no articles_classe class => ceate new articles_class and put the article iside
@@ -140,8 +176,9 @@ class ClasseController extends Controller
                     'articles' => $articleToadd
                 ]) ;
                 return response()->json([
-                    'message' => 'New class has been added : '.$request->classe_id ,
-                    'with the following articles '.$related
+                    'message' => 'new classeArticles has been added with success' ,
+                    'article' => $request->article ,
+                    'avaliableArticles' => $avaliableArticles
                 ]) ;
             }
 
@@ -177,23 +214,32 @@ class ClasseController extends Controller
         }
 
     }
-    public function deleteArticlesOnClasse(Request $request){
+    public function deleteArticlesOnClasse($classeId,$articleId){
         try {
-            $articleId = 5;
+            $articleClass = articlesClass::where('classe_id', $classeId)->first() ;
+            $Carticles = ($articleClass->articles);
+            $matchingArticle = collect($Carticles)->firstWhere('id', $articleId);
 
-            $articleClass = articlesClass::where('classe_id', $request->classe_id)
-                ->whereJsonContains('articles', ['id' => $articleId])
-                ->first();
+            // return response()->json(
+            //     [
+            //         'match'=>$matchingArticle ,
+            //         'classeId' => $classeId ,
+            //         'articleId' => $articleId
+            //     ]
+            // ) ;
 
-            if ($articleClass) {
+            if ($matchingArticle) {
                 $articles = collect($articleClass->articles)
                     ->reject(function ($article) use ($articleId) {
                         return $article['id'] == $articleId;
                     });
-
-                $articleClass->update(['articles' => json_decode($articles)]);
+                if(count($articles)>1){
+                    $articleClass->update(['articles' => json_decode($articles)]);
+                }else{
+                    $articleClass->update(['articles' => [] ]);
+                }
                 return response()->json([
-                    'article deleted successfuly'
+                    'message'=>'article deleted successfuly',
                     ]) ;
             }else{
                 return response()->json([

@@ -40,14 +40,14 @@ Route::controller(ArticleController::class)->group(function () {
 });
 
 Route::controller(ClasseController::class)->group(function () {
-    Route::get('/classes','getClasses')->middleware('auth:api') ;
+    Route::get('/classes/{etablissement}','getClasses')->middleware('auth:api') ;
     Route::post('/addClasse','addClasse')->middleware('auth:api') ;
     Route::put('/editClasse','editClasse')->middleware('auth:api') ;
-    Route::delete('/deleteClasse','deleteClasse')->middleware('auth:api') ;
+    Route::delete('/deleteClasse/{id}','deleteClasse')->middleware('auth:api') ;
 
-    Route::get('/articlesClasse','articlesClasse')->middleware('auth:api') ;
-    Route::get('/addArticlesOnClasse','addArticlesOnClasse')->middleware('auth:api') ;
-    Route::delete('/deleteArticlesOnClasse','deleteArticlesOnClasse')->middleware('auth:api') ;
+    Route::get('/articlesClasse/{id}','articlesClasse')->middleware('auth:api') ;
+    Route::post('/addArticlesOnClasse','addArticlesOnClasse')->middleware('auth:api') ;
+    Route::delete('/deleteArticlesOnClasse/{classeId}/{articleId}','deleteArticlesOnClasse')->middleware('auth:api') ;
     Route::put('/editArticlesOnClasse','editArticlesOnClasse')->middleware('auth:api') ;
 });
 

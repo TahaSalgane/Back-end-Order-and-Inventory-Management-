@@ -219,7 +219,7 @@ class ArticlesSeeder extends Seeder
         ];
 
         DB::table('articles')->insert($articles);
-    
+
 
     }
 }

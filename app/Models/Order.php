@@ -20,4 +20,7 @@ class Order extends Model
     public function reclamation(){
         return $this->hasOne(Reclamation::class) ;
     }
+    public function user(){
+        return $this->belongsTo(User::class) ;
+    }
 }

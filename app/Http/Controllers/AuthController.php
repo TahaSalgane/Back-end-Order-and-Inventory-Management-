@@ -36,6 +36,7 @@ class AuthController extends Controller
                     '_id' => $user->id,
                     'role' => $user->role,
                     'username' => $user->name,
+                    'etablissement' => $user->etablissement ,
                     'token' => $token,
                     'profile_image' =>$profileImagePath
                 ]);
@@ -52,16 +53,14 @@ class AuthController extends Controller
 
     public function Register(Request $request){
         try{
-            // return response()->json([
-            //     $request->etablissement
-            // ]) ;
-            $user=User::create([
+            User::insert([
                 'name'=>$request->name,
                 'role' => $request->role ,
                 'email'=>$request->email,
                 'etablissement' => $request->etablissement ,
                 'password'=> Hash::make($request->password)
             ]);
+            $user = User::where('email',$request->email)->first() ; // get the user instant
             $token=$user->createToken('app')->accessToken;
             return response([
                 'message'=>'registration succefull',

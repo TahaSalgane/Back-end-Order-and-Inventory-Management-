@@ -16,6 +16,6 @@ class classe extends Model
 
     public function articles()
     {
-        return $this->hasOne(articlesClass::class);
+        return $this->hasOne(articlesClass::class,'classe_id');
     }
 }
