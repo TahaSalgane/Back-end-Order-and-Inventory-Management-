@@ -26,6 +26,13 @@ class ClasseController extends Controller
                      'classes'=> $classes
                     ]) ;
             }
+            if($authUser->etablissement != $etablissment){
+                return response()->json([
+                    'back' => true ,
+                    'error' => 'You can not access to this classe !'
+                ]
+                ) ;
+            }
             $classes = classe::where('etablissement', $authUser->etablissement)->get() ;
             return response()->json([
                  'classes'=> $classes?$classes:[]
@@ -88,14 +95,26 @@ class ClasseController extends Controller
             ]) ;
         }
     }
-    public function articlesClasse($id){
+    public function articlesClasse($id,$etab){
 
-        // return response()->json($id) ;
+        $existedClasse = classe::find($id) ;
         $articlesClasse = articlesClass::where('classe_id',$id)->get()->pluck('articles') ;
         $avaliableArticles = article::all() ;
-        // return response()->json([
-        //     $articlesClasse
-        // ]) ;
+
+        if(!$existedClasse){
+            return response()->json([
+                'error' => 'No classe much !' ,
+                'back' => true
+            ]) ;
+        }
+        if(Auth::user()->role == 'directeur etablissement'){
+            if(Auth::user()->etablissement != $etab){
+                return response()->json([
+                    'back' => true ,
+                    'error' => 'You can not access to these articles !'
+                ]) ;
+            }
+        }
         if(count($articlesClasse)>0){
             return response()->json([
                 'articles' => json_decode($articlesClasse),
