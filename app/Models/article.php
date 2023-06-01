@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Order;
 
 class article extends Model
 {
@@ -11,9 +12,8 @@ class article extends Model
     protected $fillable = [
         'designationArticle'
     ] ;
-    public function order()
+    public function orders()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsToMany(Order::class);
     }
-
 }

@@ -35,10 +35,14 @@ class AuthController extends Controller
                 return response()->json([
                     '_id' => $user->id,
                     'role' => $user->role,
+                    'email'=> $user->email ,
                     'username' => $user->name,
                     'etablissement' => $user->etablissement ,
+                    'genre' => $user->genre ,
+                    'adresse' => $user->adresse ,
+                    'codePostale' => $user->codePostale ,
+                    'telephone' => $user->telephone ,
                     'token' => $token,
-                    'etablissement' => $user->etablissement,
                     'profile_image' =>$profileImagePath
                 ]);
             } else {
@@ -59,9 +63,13 @@ class AuthController extends Controller
                 'role' => $request->role ,
                 'email'=>$request->email,
                 'etablissement' => $request->etablissement ,
+                'genre' => $request->genre ,
+                'adresse' => $request->adresse ,
+                'codePostale' => $request->codePostale ,
+                'telephone' => $request->telephone ,
                 'password'=> Hash::make($request->password)
             ]);
-            $user = User::where('email',$request->email)->first() ; // get the user instant
+            $user = User::where('email',$request->email)->first() ;
             $token=$user->createToken('app')->accessToken;
             return response([
                 'message'=>'registration succefull',

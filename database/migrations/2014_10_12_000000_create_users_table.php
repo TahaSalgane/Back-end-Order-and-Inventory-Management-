@@ -17,6 +17,10 @@ return new class extends Migration
             $table->enum('role', ['magasinier', 'directeur etablissement', 'directeur complexe'])->default('magasinier');
             $table->enum('etablissement',['complexe','syba','babDokala' ,'daoudiat', 'jbelKhder'])->nullable() ;
             $table->string('email')->unique();
+            $table->string('adresse')->nullable();
+            $table->string('telephone')->nullable();
+            $table->enum('genre',['homme','femme'])->nullable();
+            $table->integer('codePostale')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

@@ -28,6 +28,10 @@ class User extends Authenticatable
         'email',
         'password',
         'isAdmin',
+        'adresse' ,
+        'telephone' ,
+        'genre' ,
+        'codePostale'
     ];
 
     /**

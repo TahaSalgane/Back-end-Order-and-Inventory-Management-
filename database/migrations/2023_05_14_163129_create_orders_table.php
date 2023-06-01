@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('titre') ;
-            $table->text('articles');
             $table->enum('etablissement',['syba','babDokala' ,'daoudiat', 'jbelKhder']) ;
             $table->enum('status',['sent','inProgress','delivered'])->default('sent') ;
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
+
         });
     }
 
