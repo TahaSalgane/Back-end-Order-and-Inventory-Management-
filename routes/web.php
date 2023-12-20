@@ -60,7 +60,6 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
 });
-
 Route::middleware('auth:api')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);

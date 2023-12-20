@@ -20,17 +20,15 @@ class userNotif extends Notification
      protected $imagePath ;
      protected $body ;
      protected $title ;
-     protected $routeName ;
      protected $toPage ;
      protected $maker ;
-     public function __construct($orderId,$userId,$imagePath,$body,$title,$routeName,$toPage,$maker)
+     public function __construct($orderId,$userId,$imagePath,$body,$title,$toPage,$maker)
      {
          $this->orderId= $orderId ;
          $this->userId= $userId ;
          $this->imagePath= $imagePath ;
          $this->body= $body ;
          $this->title= $title ;
-         $this->routeName= $routeName ;
          $this->toPage= $toPage ;
          $this->maker= $maker ;
      }
@@ -58,7 +56,6 @@ class userNotif extends Notification
             'imagePath' => $this->imagePath,
             'body' => $this->body,
             'title' => $this->title,
-            'routeName' => $this->routeName,
             'toPage' => $this->toPage,
             'maker' => $this->maker,
         ];

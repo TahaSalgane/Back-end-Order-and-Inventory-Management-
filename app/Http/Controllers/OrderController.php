@@ -8,6 +8,7 @@ use App\Models\article;
 use App\Models\User;
 use App\Notifications\userNotif;
 use Exception;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification ;
 
@@ -58,17 +59,16 @@ class OrderController extends Controller
                 [function($query) use ($authUser) {
                     return $query
                            ->where('etablissement', $authUser->etablissement)
-                           ->orWhere('etablissement','complexe')
+                           ->orWhere('role','directeur complexe')
                            ->orWhere('role','magasinier');
                    }]
             ])->get() ;
-            $imagePath = 'https://cdn.pixabay.com/photo/2013/07/12/16/51/internet-151384_1280.png' ;
+            $imagePath = 'https://static.thenounproject.com/png/1475504-200.png' ;
             $body = 'Vous avez une commande depuis letablissement ' ;
-            $title = 'Une commande a ete cree ' ;
-            $routeName = 'readNotOrder' ;
-            $toPage = 'orders' ;
+            $title = 'Une commande' ;
+            $toPage = 'ordres' ;
             $maker = $authUser->etablissement ;
-            Notification::send($users,new userNotif($order->id,$authUser->id,$imagePath,$body,$title,$routeName,$toPage ,$maker)) ;
+            Notification::send($users,new userNotif($order->id,$authUser->id,$imagePath,$body,$title,$toPage ,$maker)) ;
 
             return response()->json(['orders' => $orders]);
             // return response()->json(['order' => $order->load('articles')], 201);
@@ -82,8 +82,33 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
+        $authUser = Auth::user();
         $order->status = $request->input('status');
         $order->save();
+        $users = User::where([
+            ['id','<>',$authUser->id] ,
+            [function($query) use ($order) {
+                return $query
+                       ->where('etablissement', $order->etablissement)
+                       ->orWhere('role','directeur complexe') ;
+               }]
+        ])->get() ;
+        if($request->status == 'inProgress'){
+            $imagePath = 'https://cdn.onlinewebfonts.com/svg/img_365328.png' ;
+            $body = 'Votre commande est en cours de traitement' ;
+            $title = 'Commande "'.$order->titre.' "' ;
+            $toPage = 'ordres' ;
+            $maker = $authUser->role ;
+            Notification::send($users,new userNotif($order->id,$authUser->id,$imagePath,$body,$title,$toPage ,$maker)) ;
+        }elseif($request->status == 'delivered'){
+            $imagePath = 'https://icons.veryicon.com/png/o/business/common-icon-for-b-end-products/work-order-9.png' ;
+            $body = 'Votre commande a été livré' ;
+            $title = 'Commande "'.$order->titre.' "' ;
+            $toPage = 'ordres' ;
+            $maker = $authUser->role ;
+            Notification::send($users,new userNotif($order->id,$authUser->id,$imagePath,$body,$title,$toPage ,$maker)) ;
+
+        }
 
         $orders = Order::with('articles')->get();
         return response()->json(['orders' => $orders]);
